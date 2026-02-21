@@ -4,6 +4,8 @@ const buttonStop = document.getElementById("btnStop");
 const buttonOrder = document.getElementById("btnOrder");
 const buttonRestart = document.getElementById("btnRestart");
 const notificationArea = document.getElementById("notification");
+const receiptList = document.getElementById("receiptList");
+
 
 let currentOrder = "";
 
@@ -26,11 +28,13 @@ buttonStart.addEventListener("click", () => {
         timeDisplay.innerHTML = `
         ${displayMins}:${displaySecs}`
 
-        if(timeLeft < 0){
+        if(timeLeft <= 0){
             clearInterval(timerId);
+            timeDisplay.innerHTML = "00:00";
             notificationArea.innerHTML = `
         "Order is ready."`
         saveCompletedOrder(currentOrder);
+        timeLeft = 1500;
         }
     }, 1000);
 });
@@ -63,20 +67,43 @@ buttonOrder.addEventListener("click", () => {
     takeOrder();
 });
 
-async function saveCompletedOrder(sushiName) {
+async function saveCompletedOrder(SushiName) {
     try {
         const response = await fetch('http://localhost:3000/api/orders/complete', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({name: sushiName})
+            body: JSON.stringify({name: SushiName})
         });
         if(response.ok){
             console.log("Order saved to db.")
+            updateReceipt();
         }
     } catch (error) {
         console.log("Error:", error);
     }
 }
 
+async function updateReceipt() {
+    try {
+        const response = await fetch('http://localhost:3000/api/orders/history');
+        const pastOrders = await response.json();
+
+        receiptList.innerHTML = "";
+        
+        pastOrders.forEach((order) => {
+            if(order.Num > 1){
+                receiptList.innerHTML += `<li>x${order.Num} ${order.SushiName}</li>`
+            } else {
+                receiptList.innerHTML += `<li> ${order.SushiName}</li>`;
+            }
+        });
+
+
+    } catch (error) {
+        
+    }
+}
+
+updateReceipt();

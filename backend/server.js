@@ -32,6 +32,19 @@ app.post('/api/orders/complete', async (req, res) => {
     }
 });
 
+app.get('/api/orders/history', async (req, res) => {
+   try {
+    const result = await sql.query(`
+    SELECT SushiName, COUNT(*) as Num 
+    FROM CompletedOrders 
+    GROUP BY SushiName
+`);
+    res.json(result.recordset);
+   } catch (error) {
+    console.log("Error:", error);
+   } 
+});
+
 
 app.listen(3000, async () => {
    console.log("Server running on port 3000.") 
