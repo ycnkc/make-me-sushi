@@ -3,6 +3,7 @@ const cors = require('cors');
 const sql = require('mssql/msnodesqlv8');
 
 const app = express();
+app.use(express.json());
 app.use(cors());
 
 const config = {
@@ -15,6 +16,19 @@ app.get('/api/order', async (req, res) => {
         res.json(result.recordset[0]);
     } catch (error) {
         console .log("Error", err);
+    }
+});
+
+app.post('/api/orders/complete', async (req, res) => {
+    try {
+        const completedSushi = req.body.name;
+
+        const query = `INSERT INTO CompletedOrders (sushiName) VALUES ('${completedSushi}')`;
+        await sql.query(query);
+
+        res.status(201).json({message: "Order saved successfully."});
+    } catch (error) {
+        console.log("Error:", error);
     }
 });
 

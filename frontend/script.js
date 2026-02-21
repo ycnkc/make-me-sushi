@@ -5,7 +5,9 @@ const buttonOrder = document.getElementById("btnOrder");
 const buttonRestart = document.getElementById("btnRestart");
 const notificationArea = document.getElementById("notification");
 
-let timeLeft = 1500;
+let currentOrder = "";
+
+let timeLeft = 1;
 let timerId;
 
 let API_URL = "http://localhost:3000/api/order"
@@ -28,6 +30,7 @@ buttonStart.addEventListener("click", () => {
             clearInterval(timerId);
             notificationArea.innerHTML = `
         "Order is ready."`
+        saveCompletedOrder(currentOrder);
         }
     }, 1000);
 });
@@ -49,6 +52,8 @@ async function takeOrder(url = API_URL) {
 
         notificationArea.innerHTML = `
         "New order: ${orderInfo.name}"`
+
+        currentOrder = orderInfo.name;
     } catch (error) {
         console.log("Error:", error);
     }
@@ -57,4 +62,21 @@ async function takeOrder(url = API_URL) {
 buttonOrder.addEventListener("click", () => {
     takeOrder();
 });
+
+async function saveCompletedOrder(sushiName) {
+    try {
+        const response = await fetch('http://localhost:3000/api/orders/complete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({name: sushiName})
+        });
+        if(response.ok){
+            console.log("Order saved to db.")
+        }
+    } catch (error) {
+        console.log("Error:", error);
+    }
+}
 
