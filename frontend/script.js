@@ -49,6 +49,8 @@ buttonRestart.addEventListener("click", () => {
     timeLeft = 1500;
 });
 
+currentOrder = orderInfo.name;
+
 async function takeOrder(url = API_URL) {
     try {
         const order = await fetch(url);
@@ -56,8 +58,6 @@ async function takeOrder(url = API_URL) {
 
         notificationArea.innerHTML = `
         "New order: ${orderInfo.name}"`
-
-        currentOrder = orderInfo.name;
     } catch (error) {
         console.log("Error:", error);
     }
